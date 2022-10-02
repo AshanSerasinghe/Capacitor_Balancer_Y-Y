@@ -3,6 +3,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from methods import get_input_from_user
 from methods import reset_to_origial
+from methods import all_pairs
+from methods import get_best_shuffel
+from methods import display_best10_itteratively
+from methods import check_not_num
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -220,6 +224,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label_12.setFont(font)
         self.label_12.setObjectName("label_12")
+
         self.label_13 = QtWidgets.QLabel(self.centralwidget)
         self.label_13.setGeometry(QtCore.QRect(30, 160, 51, 21))
         font = QtGui.QFont()
@@ -227,6 +232,22 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label_13.setFont(font)
         self.label_13.setObjectName("label_13")
+
+        
+
+        
+
+
+        self.label_200 = QtWidgets.QLabel(self.centralwidget)
+        self.label_200.setGeometry(QtCore.QRect(1050, 160, 141, 141))
+        font = QtGui.QFont('Times', 20) 
+        font.setBold(True)
+        font.setWeight(1000)
+        self.label_200.setFont(font)
+        self.label_200.setObjectName("label_200")
+
+
+
         self.label_14 = QtWidgets.QLabel(self.centralwidget)
         self.label_14.setGeometry(QtCore.QRect(30, 210, 51, 21))
         font = QtGui.QFont()
@@ -350,6 +371,8 @@ class Ui_MainWindow(object):
         self.comboBox_7.addItem("")
         self.comboBox_7.addItem("")
         self.comboBox_7.addItem("")
+        self.comboBox_7.addItem("")
+
         self.label_25 = QtWidgets.QLabel(self.centralwidget)
         self.label_25.setGeometry(QtCore.QRect(950, 430, 81, 20))
         font = QtGui.QFont()
@@ -359,7 +382,7 @@ class Ui_MainWindow(object):
         self.label_25.setFont(font)
         self.label_25.setObjectName("label_25")
         self.label_26 = QtWidgets.QLabel(self.centralwidget)
-        self.label_26.setGeometry(QtCore.QRect(60, 540, 181, 20))
+        self.label_26.setGeometry(QtCore.QRect(60, 540, 290, 20))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -367,7 +390,7 @@ class Ui_MainWindow(object):
         self.label_26.setFont(font)
         self.label_26.setObjectName("label_26")
         self.label_27 = QtWidgets.QLabel(self.centralwidget)
-        self.label_27.setGeometry(QtCore.QRect(250, 540, 161, 20))
+        self.label_27.setGeometry(QtCore.QRect(390, 540, 290, 20))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -375,7 +398,7 @@ class Ui_MainWindow(object):
         self.label_27.setFont(font)
         self.label_27.setObjectName("label_27")
         self.label_28 = QtWidgets.QLabel(self.centralwidget)
-        self.label_28.setGeometry(QtCore.QRect(440, 540, 171, 20))
+        self.label_28.setGeometry(QtCore.QRect(740, 540, 290, 20))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -499,16 +522,55 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.pushButton.clicked.connect(self.get_user_data)
+        self.pushButton.clicked.connect(self.generate_pattern)
         self.actionRestore_Original.triggered.connect(self.reset)
 
         self.ORIGINAL_INPUT = {'A': ['', ''], 'B': ['', ''], 'C': ['', ''], 'a': ['', ''], 'b': ['', ''], 'c': ['', '']}
+        self.count = 0
+        self.reset_clicked = 0 
+        self.best_10 = [[] , [] , [] , [] , [], [], [], [] , [], []]
 
-    def get_user_data(self):
-        get_input_from_user(self)
+    def generate_pattern(self):
+        
+        
+
+        input_list_ = get_input_from_user(self)
+        [TF , message] = check_not_num(input_list_)
+
+        if not TF:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("Warning!")
+            msg.setText(str(message)) 
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowIcon(QtGui.QIcon('icons/Delete-icon.png'))
+            x = msg.exec_()  
+        else:
+            if self.count == 0 :
+                input_list = get_input_from_user(self)            
+                pair_obj = all_pairs(input_list)
+                pair_list = list(pair_obj)
+                
+                self.best_10 = get_best_shuffel(pair_list)
+                
+            if self.count< 10 :
+                display_best10_itteratively(self, self.best_10[self.count])
+                self.count+=1
+
+            else:
+                self.count = 0
+            
+            # set count
+            self.label_200.setText(str(self.count))
+
+
+        
+
+
     
     def reset(self):
         reset_to_origial(self)
+        self.count = 0
+        self.label_200.setText("")
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -528,6 +590,9 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "μF"))
         self.label_12.setText(_translate("MainWindow", "μF"))
         self.label_13.setText(_translate("MainWindow", "C(1,0)"))
+
+        self.label_200.setText(_translate("MainWindow", ""))
+
         self.label_14.setText(_translate("MainWindow", "C(1,1)"))
         self.label_15.setText(_translate("MainWindow", "C(1,3)"))
         self.label_16.setText(_translate("MainWindow", "C(1,2)"))
@@ -557,9 +622,12 @@ class Ui_MainWindow(object):
         self.comboBox_6.setItemText(0, _translate("MainWindow", "Third Rack"))
         self.comboBox_6.setItemText(1, _translate("MainWindow", "Second Rack"))
         self.comboBox_6.setItemText(2, _translate("MainWindow", "First Rack"))
-        self.comboBox_7.setItemText(0, _translate("MainWindow", "First Rack"))
-        self.comboBox_7.setItemText(1, _translate("MainWindow", "Second Rack"))
-        self.comboBox_7.setItemText(2, _translate("MainWindow", "Third Rack"))
+        
+        self.comboBox_7.setItemText(0, _translate("MainWindow", "All"))
+        self.comboBox_7.setItemText(1, _translate("MainWindow", "First Rack"))
+        self.comboBox_7.setItemText(2, _translate("MainWindow", "Second Rack"))
+        self.comboBox_7.setItemText(3, _translate("MainWindow", "Third Rack"))
+        
         self.label_25.setText(_translate("MainWindow", "Swap the "))
         self.label_26.setText(_translate("MainWindow", "Total 1 = "))
         self.label_27.setText(_translate("MainWindow", "Total 2 = "))
