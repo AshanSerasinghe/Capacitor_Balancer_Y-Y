@@ -128,7 +128,8 @@ def generate_groups(lst, n):
 
 def phase_capacitance(C1,C2): #to find capacitance of each branch
     try:
-        phase_capatnce = ( 1/float(C1) ) +( 1/float(C2) )
+        #phase_capatnce = ( 1/float(C1) ) +( 1/float(C2) )
+        phase_capatnce = float(C1)*float(C2)/(float(C1) + float(C2))
     except:
         phase_capatnce = 0
 
